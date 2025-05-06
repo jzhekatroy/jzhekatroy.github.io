@@ -2,44 +2,56 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App</title>
+    <title>Оплата услуги</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            background: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        body { font-family: Arial; padding: 20px; text-align: center; }
+        button { 
+            padding: 10px 20px; 
+            background: #0088cc; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
             cursor: pointer;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Привет, Telegram Web App! 👋</h1>
-    <p>Твой ID: <span id="user-id">...</span></p>
-    <button onclick="sendData()">Отправить данные в Telegram</button>
+    <h1>Оплата услуги</h1>
+    <p>Автомойка "Блеск"</p>
+    <p>Стоимость: <strong>500 ₽</strong></p>
+    
+    <button onclick="pay()">Оплатить</button>
 
     <script>
         const tg = window.Telegram.WebApp;
+        tg.expand(); // Раскрыть Web App на весь экран
 
-        // Показываем информацию о пользователе
-        document.getElementById('user-id').textContent = tg.initDataUnsafe.user?.id || 'Аноним';
+        function pay() {
+            // Параметры платежа
+            const invoice = {
+                title: "Мойка автомобиля",
+                description: "Полная мойка + полировка",
+                payload: "order_123", // Уникальный ID заказа
+                currency: "RUB",
+                prices: [
+                    { label: "Мойка", amount: 50000 } // 500 ₽ (в копейках!)
+                ],
+                provider_token: "TEST:1234567890abcdef" // Ваш токен из BotFather
+            };
 
-        // Развернуть приложение на весь экран
-        tg.expand();
-
-        // Функция для отправки данных в Telegram
-        function sendData() {
-            tg.sendData("Данные отправлены из Web App!");
-            tg.close(); // закрыть Web App
+            // Отправка платежа
+            tg.sendInvoice(invoice);
         }
+
+        // Обработка успешной оплаты
+        tg.onEvent('invoiceClosed', (event) => {
+            if (event.status === 'paid') {
+                tg.showAlert("Оплата прошла успешно! Спасибо!");
+                tg.close();
+            }
+        });
     </script>
 </body>
 </html>
