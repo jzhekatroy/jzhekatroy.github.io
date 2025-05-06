@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Привет, Telegram Web App! 👋</h1>
+    <p>Твой ID: <span id="user-id">...</span></p>
+    <button onclick="sendData()">Отправить данные в Telegram</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        // Показываем информацию о пользователе
+        document.getElementById('user-id').textContent = tg.initDataUnsafe.user?.id || 'Аноним';
+
+        // Развернуть приложение на весь экран
+        tg.expand();
+
+        // Функция для отправки данных в Telegram
+        function sendData() {
+            tg.sendData("Данные отправлены из Web App!");
+            tg.close(); // закрыть Web App
+        }
+    </script>
+</body>
+</html>
