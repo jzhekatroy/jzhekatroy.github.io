@@ -5,7 +5,46 @@
     <title>Барбершоп "Брутально"</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: Arial; padding: 20px; max-width: 500px; margin: 0 auto; }
+        body { font-family: Arial; padding:<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Telegram Web App Test</title>
+</head>
+<body>
+  <h2>Telegram Web App Test</h2>
+  <pre id="output">Ожидание данных от Telegram...</pre>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+
+    const output = document.getElementById('output');
+
+    const initData = tg.initData;
+    const user = tg.initDataUnsafe.user;
+
+    output.innerText = JSON.stringify(user, null, 2);
+
+    // отправка на ваш сервер (укажите реальный адрес)
+    fetch('https://5.131.249.68/api/telegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        initData: initData,
+        user: user
+      })
+    }).then(resp => {
+      output.innerText += '\n\n✅ Данные отправлены на сервер';
+    }).catch(err => {
+      output.innerText += '\n\n❌ Ошибка при отправке: ' + err.message;
+    });
+  </script>
+</body>
+</html>
+ 20px; max-width: 500px; margin: 0 auto; }
         select, button { width: 100%; padding: 10px; margin: 10px 0; }
         button { background: #0088cc; color: white; border: none; cursor: pointer; }
         .hidden { display: none; }
