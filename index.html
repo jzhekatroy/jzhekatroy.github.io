@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Барбершоп "Брутально"</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: Arial; padding:<!DOCTYPE html>
-<html>
-<head>
   <meta charset="UTF-8">
   <title>Telegram Web App Test</title>
 </head>
@@ -42,102 +35,5 @@
       output.innerText += '\n\n❌ Ошибка при отправке: ' + err.message;
     });
   </script>
-</body>
-</html>
- 20px; max-width: 500px; margin: 0 auto; }
-        select, button { width: 100%; padding: 10px; margin: 10px 0; }
-        button { background: #0088cc; color: white; border: none; cursor: pointer; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-    <div id="auth-section">
-        <h1>Вход через Telegram</h1>
-        <p>Нажмите кнопку, чтобы авторизоваться:</p>
-        <button onclick="login()">Войти</button>
-    </div>
-
-    <div id="booking-section" class="hidden">
-        <h2>Запись к мастеру</h2>
-        <select id="master">
-            <option value="">Выберите мастера</option>
-            <option value="andrey">Андрей</option>
-            <option value="evgeny">Евгений</option>
-        </select>
-        <input type="date" id="date" min="">
-        <select id="time">
-            <option value="">Выберите время</option>
-        </select>
-        <button onclick="book()">Записаться и оплатить</button>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Показываем интерфейс записи только после авторизации
-        if (tg.initDataUnsafe.user) {
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('booking-section').classList.remove('hidden');
-            loadUserData();
-        }
-
-        function login() {
-            tg.showAlert("Вы уже авторизованы через Telegram!");
-        }
-
-        function loadUserData() {
-            // Заполняем дату и время
-            document.getElementById('date').min = new Date().toISOString().split('T')[0];
-            const timeSelect = document.getElementById('time');
-            for (let hour = 9; hour <= 18; hour++) {
-                timeSelect.innerHTML += `<option value="${hour}:00">${hour}:00</option>`;
-            }
-        }
-
-        async function book() {
-            const master = document.getElementById('master').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-
-            if (!master || !date || !time) {
-                tg.showAlert("Заполните все поля!");
-                return;
-            }
-
-            // Отправляем данные на сервер для проверки
-            const response = await fetch('https://jzhekatroy.github.io/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    initData: tg.initData,  // Подписанные данные Telegram
-                    booking: { master, date, time }
-                })
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                // Платеж
-                const invoice = {
-                    title: `Стрижка у ${master === 'andrey' ? 'Андрея' : 'Евгения'}`,
-                    description: `Дата: ${date}, Время: ${time}`,
-                    payload: `user_${tg.initDataUnsafe.user.id}_${Date.now()}`,
-                    currency: "RUB",
-                    prices: [{ label: "Стрижка", amount: 150000 }],
-                    provider_token: "1744374395:TEST:c6bdd8f8bfc7ac0858ef"
-                };
-                tg.sendInvoice(invoice);
-            } else {
-                tg.showAlert("Ошибка авторизации!");
-            }
-        }
-
-        tg.onEvent('invoiceClosed', (event) => {
-            if (event.status === 'paid') {
-                tg.showAlert("✅ Оплата принята! Ждём вас.");
-                tg.close();
-            }
-        });
-    </script>
 </body>
 </html>
