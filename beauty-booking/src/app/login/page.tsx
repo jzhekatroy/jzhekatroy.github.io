@@ -4,12 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function HomePage() {
+export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    teamName: '',
-    contactPerson: ''
+    password: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -21,7 +19,7 @@ export default function HomePage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,10 +32,15 @@ export default function HomePage() {
       if (response.ok) {
         // Сохраняем токен в localStorage
         localStorage.setItem('token', data.token)
-        // Перенаправляем в админку команды
-        router.push('/admin')
+        
+        // Перенаправляем в зависимости от роли
+        if (data.user.role === 'SUPER_ADMIN') {
+          router.push('/super-admin')
+        } else {
+          router.push('/admin')
+        }
       } else {
-        setError(data.error || 'Ошибка регистрации')
+        setError(data.error || 'Ошибка входа')
       }
     } catch (error) {
       setError('Ошибка соединения с сервером')
@@ -61,13 +64,13 @@ export default function HomePage() {
             Beauty Booking
           </h1>
           <p className="text-gray-600">
-            Система записи на бьюти-услуги
+            Войти в систему
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-            Регистрация новой команды
+            Вход в аккаунт
           </h2>
 
           {error && (
@@ -77,38 +80,6 @@ export default function HomePage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 mb-2">
-                Название салона
-              </label>
-              <input
-                type="text"
-                id="teamName"
-                name="teamName"
-                required
-                value={formData.teamName}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Название вашего салона"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700 mb-2">
-                Контактное лицо
-              </label>
-              <input
-                type="text"
-                id="contactPerson"
-                name="contactPerson"
-                required
-                value={formData.contactPerson}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Ваше имя"
-              />
-            </div>
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
@@ -137,8 +108,7 @@ export default function HomePage() {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Минимум 6 символов"
-                minLength={6}
+                placeholder="Введите пароль"
               />
             </div>
 
@@ -147,15 +117,22 @@ export default function HomePage() {
               disabled={isLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition duration-200"
             >
-              {isLoading ? 'Создание...' : 'Создать команду'}
+              {isLoading ? 'Вход...' : 'Войти'}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
-            Уже есть аккаунт?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
-              Войти
-            </Link>
+          <div className="mt-6 text-center space-y-2">
+            <div className="text-sm text-gray-600">
+              Нет аккаунта?{' '}
+              <Link href="/" className="text-blue-600 hover:text-blue-500 font-medium">
+                Зарегистрировать команду
+              </Link>
+            </div>
+            <div className="text-sm text-gray-600">
+              <Link href="/forgot-password" className="text-blue-600 hover:text-blue-500">
+                Забыли пароль?
+              </Link>
+            </div>
           </div>
         </div>
 
