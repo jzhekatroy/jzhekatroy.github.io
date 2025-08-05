@@ -129,11 +129,34 @@ export default function BookingWidget() {
   const handleSubmit = async () => {
     setIsLoading(true)
     
-    // Имитация отправки данных
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    setIsCompleted(true)
-    setIsLoading(false)
+    try {
+      // Создаем бронирование через API
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          teamSlug: slug,
+          serviceIds: selectedServices.map(s => s.id),
+          masterId: selectedMaster?.id,
+          startTime: new Date(`${selectedDate}T${selectedTime}:00`).toISOString(),
+          clientData
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setIsCompleted(true)
+      } else {
+        alert(`Ошибка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Ошибка соединения с сервером')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (isCompleted) {
